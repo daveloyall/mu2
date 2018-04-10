@@ -27,13 +27,13 @@ Ensure ports 22, 25, 53, 80, 8081, are open for inbound traffic.
 
     PORT    TYPE    FUNCTION
     ----    ----    -------------------------------------
-    22      TCP      ssh               
+    22      TCP      ssh
     25      TCP      SMTP (Unencrypted)
-    53      TCP      DNS  
+    53      TCP      DNS
     53      UDP      DNS
     80      TCP      HTTP (not absolutley needed unless you run Apache, Squirrel mail, etc.
     110     TCP      POP3
-    8081    TCP      HTTP Tomcat. Give access to http://yourhost:8081/config-ui 
+    8081    TCP      HTTP Tomcat. Give access to http://yourhost:8081/config-ui
 
 
 Install Prerequsites:
@@ -42,20 +42,18 @@ Install Prerequsites:
     sudo apt-get update
     sudo apt-get -y install ant unzip openjdk-7-jdk nmap ant
 
-    
+
 Setup JAVA_HOME:
 ----------------
 
     export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
     echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc
-    export JAVA_OPTS="-Xmx256m -XX:MaxPermSize=256m"
-    echo "export JAVA_OPTS=\"$JAVA_OPTS\"" >> ~/.bashrc
     source ~/.bashrc 
 
 
 Verify Java 7 is Installed:
 ---------------------------
-    
+
     java -version
 
 
@@ -73,7 +71,19 @@ Get Direct version :
 --------------------
 
 Download the version of direct you want to use.  We are using both 1.3 and 2.0
-in this tutorial but if you are just starting I'd reccomend using 2.0.
+in this tutorial but if you are just starting I'd reccomend using 3.0.1.
+
+5.0
+
+    wget http://repo2.maven.org/maven2/org/nhind/direct-project-stock/5.0/direct-project-stock-5.0.tar.gz
+
+4.0
+
+    wget http://repo2.maven.org/maven2/org/nhind/direct-project-stock/4.0/direct-project-stock-4.0.tar.gz
+
+3.0.1
+
+    wget http://repo2.maven.org/maven2/org/nhind/direct-project-stock/3.0.1/direct-project-stock-3.0.1.tar.gz
     
 2.0
 
@@ -92,7 +102,7 @@ Unpack the Direct Project:
 --------------------------
 
 Unpack your chosen version of direct.
-    
+
     tar -zxvf direct-project-stock-2.0.tar.gz
 
 Setup More Environment Variables
@@ -104,7 +114,7 @@ Setup More Environment Variables
 
 Start Tomcat
 ------------
-    
+
     cd $DIRECT_HOME/apache-tomcat-7.0.32/bin
     ./startup.sh
 
@@ -197,8 +207,8 @@ Now click on "Agent Settings". Add the following Key Value settings.
     MDNAutoResponse     true
     PrivateStoreType    WS
     PublicStoreType     WS,DNS,PublicLDAP
-    
-    
+
+
 Now click on Certificates.
 
 1. Add the certificate "alan.der", select Enabled for status and click "Add Certificate."
@@ -211,17 +221,16 @@ via Web Services.  The Agent Setting "PublicStoreType", says "try the web servic
 then DNS, and then LDAP.
 
 Note that any time something changes here, you will need to shutdown and restart
-the James email server in version 1.3, but should not have to do this in 1.4 or 2.0.
-as of version 1.4, these agent setting are refreshed from the configuration
-service every 5 minutes.  So unless you need the changes to take affect
-immediately, James does not need to be restarted.
+the James email server in version 1.3, but should not have to do this in 1.4 or 2.0. As of version 1.4, these agent setting are refreshed from the configuration service every 5 minutes.  So unless you need the changes to take affect immediately, James does not need to be restarted.
 
 
-Lets configure and fire up the James webserver now.
+Lets configure and fire up the James email server now.
 
 
 Setup James
 -----------
+
+Note that `ant` should be installed and on your `$PATH`.
 
     cd $DIRECT_HOME/james-2.3.2
     sh bin/setdomain.sh <your domain name>
@@ -231,7 +240,7 @@ Start James
 
     cd $DIRECT_HOME/james-2.3.2
     sudo -E sh bin/run.sh > james.log 2>&1 &
-    
+
 Create a few users on James
 ----------------------------
 
@@ -241,7 +250,7 @@ Create a few users on James
     adduser bill password
     adduser alan password
     quit
-    
+
 Start the DNS Server
 --------------------
 
@@ -288,7 +297,7 @@ Just add the accounts with the following information.
 User 1:
 
     user:               alan
-    password:           password 
+    password:           password
     pop3 server:        direct.microphr.com
     smtp server:        direct.microphr.com
 
@@ -296,15 +305,15 @@ User 1:
 User 2:
 
     user:               bill
-    password:           password 
+    password:           password
     pop3 server:        direct.microphr.com
     smtp server:        direct.microphr.com
 
-    
+
 User 3:
 
     user:               alan
-    password:           password 
+    password:           password
     pop3 server:        direct.transparenthealth.org
     smtp server:        direct.transparenthealth.org
 
@@ -312,7 +321,7 @@ User 3:
 User 4:
 
     user:               bill
-    password:           password 
+    password:           password
     pop3 server:        direct.transparenthealth.org
     smtp server:        direct.transparenthealth.org
 
@@ -365,20 +374,20 @@ MX (Mail Exchange) Records:
     =============         =================         =====
     microphr.com.         ns1.microphr.com.         86400 	
     microphr.com.         ns2.microphr.com.         86400 	
-    
-    
+
+
 The next step is to make sure that the domain you are using uses the DNS server
 we just configured.  You may need to ask you hosting provider to setup some custom
 routes before you are able to point your domain's name servers to the DNS server.
 This step could take a few hours up to a day or two to complete.
 
 Go to your domain hosting providers website and setup the NS records to point to
-"ns1.microphr.com" and "ns1.microphr.com". 
+"ns1.microphr.com" and "ns1.microphr.com".
 
 You can verify this step is completed by using whois.
 
     whois microphr.com
-    
+
 You should see this in the output.
 
     Name Server.......... ns1.microphr.com
@@ -390,7 +399,7 @@ Now the public certificates you setup are accessiable via DNS.  You can test
 this with dig.
 
     dig alan.direct.microphr.com CERT
-    
+
 will return
 
     ;; Truncated, retrying in TCP mode.
@@ -429,17 +438,105 @@ will return
     ;; WHEN: Mon Nov 12 19:34:10 2012
     ;; MSG SIZE  rcvd: 1002
 
-You now have a fully functioning version of Direct RI.  The following steps are
-optional but probally a good idea.  They have only been tested on Direct RI 2.0.
+You now have a fully functioning version of Direct RI.  The following steps are optional but probally a good idea.  They have only been tested on Direct RI 2.0.
 
 
-Optional Setup Steps
-====================
+Deliver MDNs to the Edge Client
+===============================
 
-Setting up James 3, IMAP, TTL, and SquirrelMail (TOFO)
+In the file `$DIRECT_HOME/james-2.3.2/apps/james/SAR-INF/config.xml` find the line `<ConsumeMDNProcessed>true</ConsumeMDNProcessed>` and change the faclue from `true` to `false`. Restart James.
+
+In James 3 the file to edit is `$DIRECT_HOME/apache-james-3.0-beta4/conf/mailetcontainer.conf`.
 
 
 Change the Password on the RI
 =============================
 
-TODO
+Issue the following commands to backup the original file and find/place the password.
+
+
+    cp $DIRECT_HOME/apache-tomcat-7.0.32/webapps/config-ui/WEB-INF/config-servlet.xml $DIRECT_HOME/apache-tomcat-7.0.32/webapps/config-ui/WEB-INF/config-servlet.xml.orig
+    sed -i "s/adm1nD1r3ct/your_new_password/g" $DIRECT_HOME/apache-tomcat-7.0.32/webapps/config-ui/WEB-INF/config-servlet.xml
+    cd $DIRECT_HOME/apache-tomcat-7.0.32
+    sh bin/shutdown.sh
+    sh bin/startup.sh
+
+
+
+Optional Setup Steps
+====================
+
+Setting up James 3, IMAP, & STARTLS
+------------------------------------
+
+shut down James2 if running.
+
+
+Give Java more heap memory:
+
+    export JAVA_OPTS="-Xmx256m -XX:MaxPermSize=256m"
+
+change to James3 directory
+
+    cd $DIRECT_HOME/apache-james-3.0-beta4/
+
+In the file `$DIRECT_HOME/apache-james-3.0-beta4/conf/wrapper.conf` under the section "# Java Additional Parameters", add the following lines:
+
+    wrapper.java.additional.16=-Xmx256m
+    wrapper.java.additional.15=-XX:MaxPermSize=256m
+
+Start James 3.
+
+    cd $DIRECT_HOME/apache-james-3.0-beta4/bin
+    ./james start
+
+Use `$DIRECT_HOME/apache-james-3.0-beta4/bin/james-cli.sh` to create users, etc.
+
+
+
+
+
+Other Notes:
+============
+
+
+Fixing .p12 bug in 4.0
+----------------------
+In 4.0 there is a bug related to .p12 files.  To fix do the following
+
+* Shutdown James and Tomcat and perform the following
+* `cd   $DIRECT_HOME/apache-tomcat-7.0.59/webapps/config-service/WEB-INF/lib` 
+* `rm `config-store-1.5.1.jar`
+* `wget https://oss.sonatype.org/content/repositories/snapshots/org/nhind/config-store/1.5.1-SNAPSHOT/config-store-1.5.1-20150730.130206-1.jar`
+* `cd $DIRECT_HOME`
+* `mv  nhindconfig nhindconfig-bak`
+* `$DIRECT_HOME/apache-tomcat-7.0.59/bin/startup.sh`
+
+
+Resolving the issue where config service forgets its configuration information upon restart.
+-------------------------------------------------------------------------------
+I have encountered this issue on Redhat but not on Ubuntu. The fix is to add an
+absolute path instead of a relative path inside the JPA Derby Configuration section withing the file.
+`$DIRECT_HOME/apache-tomcat-7.0.59/webapps/config-service/WEB-INF/beans.xml`.
+
+Find the term `jdbc:derby:nhindconfig` and replace `nhindconfig` with the full path.
+
+For example, if your RI is installed at `/opt/direct`, then the resulting configuration 
+would look like:
+
+
+`<property name="url" value="jdbc:derby:/opt/direct/apache-tomcat-7.0.59/bin/nhindconfig;create=true" />`
+
+Stop and start Tomcat to complete.
+
+
+
+
+
+Configuring MySQL or Oracle:
+----------------------------
+
+Change database settings by editing the file `$DIRECT_HOME/apache-tomcat-7.0.59/webapps/config-service/WEB-INF/beans.xml`. By default Derby is used. If MySQL is used a DB must be setup and a DB user created.  The MySQL Jars must also be added as they are not bundled with the RI.
+
+
+
